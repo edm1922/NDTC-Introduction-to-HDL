@@ -1,0 +1,67 @@
+library IEEE;
+USE ieee.std_logic_1164.all;
+USE ieee.std_logic_arith.all;
+USE ieee.std_logic_unsigned.all;
+
+ENTITY trial IS
+    PORT (
+        -- Inputs
+        SW3_0    : IN STD_LOGIC_VECTOR(3 downto 0);
+        SW7_4    : IN STD_LOGIC_VECTOR(7 downto 4);
+        SW9      : IN STD_LOGIC;
+        KEY0     : IN STD_LOGIC;
+		  
+        
+        -- Outputs
+        LEDG     : OUT STD_LOGIC;
+        HEX0     : OUT STD_LOGIC_VECTOR(3 downto 0);
+        HEX1     : OUT STD_LOGIC_VECTOR(3 downto 0);
+        HEX3     : OUT STD_LOGIC_VECTOR(3 downto 0)
+    );
+END  trial;
+
+ARCHITECTURE behavior OF  trial IS
+    SIGNAL address   : STD_LOGIC_VECTOR(3 downto 0);
+    SIGNAL data_in   : STD_LOGIC_VECTOR(3 downto 0);
+    SIGNAL writed    : STD_LOGIC;
+    SIGNAL data_out  : STD_LOGIC_VECTOR(3 downto 0);
+    SIGNAL clk       : STD_LOGIC;
+
+BEGIN
+    LEDG <= writed;  -- Display the Write signal on LEDG0
+    
+    -- Clock generation
+    process(KEY0)
+    BEGIN
+        if rising_edge(KEY0) then
+            clk <= not clk;
+        end if;
+    END process;
+
+    process(clk)
+    BEGIN
+        if rising_edge(clk) then
+            if SW9 = '1' then
+                -- Write data to "memory"
+                address <= SW7_4;
+                data_in <= SW3_0;
+                writed <= '1';
+            else
+                -- Read data from "memory"
+                address <= SW7_4;
+                writed <= '0';
+                data_out <= data_in;  -- Data output is the same as data input
+            end if;
+        end if;
+    END process;
+
+    -- Display address on HEX3
+    HEX3 <= address;
+
+    -- Display data_in on HEX1
+    HEX1 <= data_in;
+
+    -- Display data_out on HEX0
+    HEX0 <= data_out;
+
+END behavior;
